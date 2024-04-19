@@ -1,35 +1,46 @@
-import express from 'express';
+import express from "express";
+import mongoose from "mongoose";
+
 
 const app = express();
 
 app.use(express.json());
 
-app.get('/', (req,res) => {
-    res.send("HELLOO...")
+app.get("/", (req,res) => {
+    res.send("HELLO FROM DEMO")
 });
 
-app.post('/register',(req,res) => {
+app.post('/register', async (req,res) => {
     try {
-        console.log(req.body, "requested body");
+        const  { name, email, password, age } = req.body;
+        if(!name || !email || !password || !age)
+        return res
+          .status(404)
+          .json({ success: false, message: "All fields are required..."});
 
-        const {name, email, password, confirmPassword} = req.body;
-        console.log(name,email,password, confirmPassword, "name");
-
-        if(!name || !email || !password || !confirmPassword){
-            res.send("All fields are required")
-        }
-        if(password !== confirmPassword){
-            res.send("password and confirm Password are not same")
-        }
-        res.send("Registration Completed");
-        console.log("Regi Success")
+          const user = new UserSchema2({
+            name: name,
+            email: email,
+            password: password,
+            age : age,
+          });
+          console.log(user, "user");
+          await user.save();
+          res
+          .status(201)
+          .json({success: true, message: "Registration Completed..."});
     } catch (error) {
-        res.send(error)
+        return res.status(500).json({success: false, error});
     }
+});
+
+mongoose.connect(process.env.MONGODB_URL).then(() => {
+    console.log("DB CONNECTED");
 })
 
 
 app.listen(3000, () => {
-    console.log("SERVER LISTINING ON PORT 3000")
-});
+    console.log("Server on 3000")
+})
+
 
