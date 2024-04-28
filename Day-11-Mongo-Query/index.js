@@ -18,7 +18,7 @@ app.get("/filter-users", async (req, res) => {
     const { age, name } = req.body;
 
     // const users = await UserSchema.find();
-    // const users = await UserSchema.find({ name: "Sahil", email:"sahil@gamil.com"});
+    const users = await UserSchema.find({ name: "Sahil", email:"sahil@gamil.com"});
     // const users = await UserSchema.find({age: 20});
     // const users = await UserSchema.find({age: {$eq: 25}});
     // const users = await UserSchema.find({age: {$gt: 20}});
@@ -30,7 +30,7 @@ app.get("/filter-users", async (req, res) => {
     // const users = await UserSchema.find({gender: {$exists: true}});
     // const users = await UserSchema.find({$and: [{ age: { $eq: parseInt(20) } },{ name: { $eq: "Ram" } },],});
     // const users = await UserSchema.find({$or : [{age: {$eq: parseInt(25)}}, {name: {$eq: "Ram"}} ,], });
-    const users = await UserSchema.find({$nor : {age: 20}});
+    // const users = await UserSchema.find({$nor : {age: 20}});
 
     return res.status(200).json({ success: true, users });
   } catch (error) {
