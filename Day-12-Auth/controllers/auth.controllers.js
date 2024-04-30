@@ -1,5 +1,6 @@
 import UserSchema from "../models/user.schema.js";
 import bcrypt from "bcrypt";
+import { json } from "express";
 import jwt from "jsonwebtoken";
 
 export const Register = async(req, res) => {
@@ -67,13 +68,58 @@ export const Login = async (req, res) => {
             return res.json({success: false, message: "Invalid password Please try again later"})
         }
 
-        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET )
-        console.log(token, "token");
+        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '1h'}) //Setting expiry time 1 hour 
+        // console.log(token, "token");
         res.cookie("token", token)
 
         return res.json({success: true, message:"Login Successfull", userData: user,})
         
         // res.send("Login");
+
+    } catch (error) {
+        console.log(error, "error")
+        return res.json({error, success: false});
+    }
+}
+
+
+export const validateToken = async (req, res) =>{
+    try {
+        const token = req.cookies.token;
+        console.log(token)
+        if(!token){
+            return res.json({
+                success: false,
+                message: "Invalid Token"
+            });
+        }
+        const decodedData = await jwt.verify(token, process.env.JWT_SECRET) 
+        // console.log(decodedData);
+        if(!decodedData.id){
+            return res.json({
+                success: false,
+                message: "Token Expired"
+            });
+        }
+
+        const currentTime = Math.floor(Date.now() / 1000);
+        if(decodedData.exp < currentTime){
+            return res.json({
+                success: false,
+                message: "Token Expired"
+            });
+        }
+
+        const user = await UserSchema.findById(decodedData.id);
+        console.log(user)
+        if(!user){
+            return res.json({
+                success: false,
+                message: "Invalid Token"
+            })
+        }
+
+        return res.json({user, success: true})
 
     } catch (error) {
         console.log(error, "error")
