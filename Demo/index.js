@@ -1,72 +1,40 @@
-import express from "express"
-// import { Login } from "./models/student.schema.js";
+import express from "express";
 import mongoose from "mongoose";
-import dotenv from "dotenv"
-import StudentSchema from "./controller/student.controller.js";
-import EmpSchema from "./models/employee.schema.js";
+import dotenv from "dotenv";
+import UserSchema from "./models/user.schema.js";
 
 const app = express();
-
+app.use(express.json());
 dotenv.config();
 
-app.use(express.json());
-
 app.get("/", (req,res) => {
-    res.send("HELLO FROM MVC DEMO")
+    res.send("Hello from demo")
 });
 
-app.post("/login", async(req,res) => {
+app.post("/add-user",async (req,res) => {
     try {
-        const {email, password} = req.body;
-        if(!email || !password)
-        return res
-        .status(404)
-        .json({success: false, message: "All fields are required..."});
-
-        const student = new StudentSchema({
-            email: email,
-            password: password
-        });
-        console.log(student, "Students");
-        await student.save();
-        res
-        .status(201)
-        .json({success: true, message:"Login Success..."});
-        
-    } catch (error) {
-        return res.status(500).json({success: false, error});
+    const {name, email, gender, age} = req.body;
+    if(!name || !email || !gender || !age){
+        return res.json({success: false, message: "All fields are required..."})
     }
-});
-
-app.post("/emp", async(req,res) => {
-    try {
-        const {name, id, salary, gender} = req.body;
-        if(!name || !id || !salary || !gender)
-        return res
-    .status(404)
-    .json({success: false, message: "All Fields Are Required..."});
-
-    const employee = new EmpSchema({
+    const newUser = new UserSchema({
         name: name,
-        id: id,
-        salary: salary,
-        gender: gender
-    });
-    console.log(employee, "employee");
-    await employee.save();
-    res
-    .status(201)
-    .json({success: true, message: "Data Stored Successfully"})
+        email: email,
+        gender: gender,
+        age: age
+    })
+    await newUser.save()
+    return res.json({success: true, message: "User Successfully Stored In DB"})
     } catch (error) {
-        return res.status(500).json({success: false, error})
+        return res.status(500).json({success:false, error})
     }
 })
 
 mongoose.connect(process.env.MONGODB_URL).then(()=>{
-    console.log("Database Connected")
-})
+    console.log("DB CONNECTED")
+});
 
-app.listen(3000,() => {
-    console.log("Server is listining on port 3000")
+app.listen(3000, ()=> {
+    console.log("Server Listining on port 3000")
 })
 
