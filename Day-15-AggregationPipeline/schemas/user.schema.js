@@ -5,6 +5,9 @@ const userSchema = new Schema({
     email: String,
     password: String,
     confirmPassword: String,
+    role: String,
+    cart: [String],
+    wishlist: [String],
 })
 
 const UserSchema = model("User", userSchema);
