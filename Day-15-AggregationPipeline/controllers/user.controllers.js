@@ -72,7 +72,7 @@ export const login = async (req, res) => {
         console.log(token, "token");
         res.cookie("token", token)
 
-        return res.json({success: true, message:"Login Successfull", userData: {name: user.name, email: user.email, role: user.role },})
+        return res.json({success: true, message:"Login Successfull", userData: {name: user.name, email: user.email, role: user.role, _id: user._id},})
         
         // res.send("Login");
 
@@ -134,5 +134,29 @@ export const logout = async (req,res) => {
     } catch (error) {
         console.log(error, "error");
         return res.json({error, success: false})
+    }
+}
+
+export const addToCart = async (req,res) => {
+    try {
+        const{ userId, productId } = req.body;
+        console.log(userId, productId);
+        const user = await UserSchema.findByIdAndUpdate(
+            userId,
+            {
+               $addToSet: {cart: productId}
+            },
+            {
+                new: true
+            }
+         );
+         if(!user){
+            return res.json({success: false, message: "User Not Found"})
+         }
+         console.log(user, "user")
+         return res.json({success: true, message: "Product successfully added to cart"})
+    } catch (error) {
+        console.log(error, "error");
+        return res.json({error, success: false});
     }
 }
