@@ -160,3 +160,36 @@ export const addToCart = async (req,res) => {
         return res.json({error, success: false});
     }
 }
+
+export const showCart = async (req,res) => {
+    try {
+        const { userId } = req.body;
+        const user = await UserSchema.findById(userId).populate('cart');
+        if(!user){
+            return res.json({success: false, message: "User Not Found"})
+        }
+        return res.json({success: true, cart: user.cart});
+    } catch (error) {
+        console.log(error)
+        return res.json({error, success: false});
+    }
+}
+
+export const removeFromCart = async (req,res) => {
+    try{
+        const {userId, productId} = req.body;
+        const user = await UserSchema.findByIdAndUpdate(
+            userId,
+            {$pull : {cart: productId}},
+            {new: true}
+        );
+        if(!user){
+            return res.json({success: false, message: "User Not Found"})
+        }
+        return res.json({ success: true, message: "Product removed from cart", cart: user.cart});
+
+    } catch (error){
+        console.log(error);
+        return res.json({success: false, error});
+    }
+}
