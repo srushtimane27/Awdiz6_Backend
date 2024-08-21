@@ -7,11 +7,13 @@ import cookieParser from "cookie-parser";
 import AllRoutes from "./routes/index.js";
 
 const app = express();
+
 var corsOptions = {
   origin: "http://localhost:3000",
   credentials: true,
 };
 app.use(cors(corsOptions));
+
 dotenv.config();
 app.use(express.json());
 app.use(cookieParser());
